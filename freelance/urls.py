@@ -1,12 +1,8 @@
-from django.contrib import admin
 from django.urls import path
-
-import freelance.views
+from . import views
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("", freelance.views.home),
-    path("posts/", freelance.views.post_list),
-    path("posts/<int:post_id>/", freelance.views.post_detail),
+    path("", views.home, name="home"),
+    path("posts/", views.post_list, name="post_list"),
+    path("posts/<int:post_id>/", views.post_detail, name="post_detail"),
 ]
-

@@ -5,7 +5,15 @@
 <ul>
     {% for post in posts %}
         <li>
-            <a href="/posts/{{post.id}}/">{{post.title}}</a>
+             <h4>
+                <a href="/posts/{{ post.id }}/">{{ post.title }}</a>
+            </h4>
+
+            {% if post.photo %}
+                <img src="{{ post.photo.url }}" width="200">
+            {% else %}
+                <img src="/static/image1.png" width="200">
+            {% endif %}
         </li>
         {% endfor %}
 </ul>
