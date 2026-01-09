@@ -4,17 +4,20 @@
 <h2>Заказы</h2>
 <ul>
     {% for post in posts %}
-        <li>
-             <h4>
-                <a href="/posts/{{ post.id }}/">{{ post.title }}</a>
-            </h4>
-
+        <div class="col-md-4 mb-4">
+        <div class="card">
             {% if post.photo %}
-                <img src="{{ post.photo.url }}" width="200">
+                <img src="{{ post.photo.url }}" class="card-img-top" alt="...">
             {% else %}
-                <img src="/static/image1.png" width="200">
+                <img src="/static/image1.png" class="card-img-top" alt="...">
             {% endif %}
-        </li>
+            <div class="card-body">
+                <h5 class="card-title">{{ post.title }}</h5>
+                <p class="card-text">{{ post.description|truncatechars:60 }}</p>
+                <a href="/posts/{{ post.id }}/" class="btn btn-primary">Подробнее</a>
+            </div>
+        </div>
+    </div>
         {% endfor %}
 </ul>
 {% endblock %}
