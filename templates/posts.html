@@ -3,22 +3,74 @@
 {% block content %}
 <h2>Заказы</h2>
 <ul>
-    {% for post in posts %}
-        <div class="col-md-4 mb-4">
-        <div class="card">
+<form method="GET" action="">
+    {{ form.as_p }}
+    <button type="submit">Search</button>
+</form>
+<div class="row">
+{% for post in posts %}
+    <div class="col-md-4 mb-4">
+        <div class="card" style="width: 18rem;">
             {% if post.photo %}
                 <img src="{{ post.photo.url }}" class="card-img-top" alt="...">
             {% else %}
                 <img src="/static/image1.png" class="card-img-top" alt="...">
             {% endif %}
+
             <div class="card-body">
                 <h5 class="card-title">{{ post.title }}</h5>
-                <p class="card-text">{{ post.description|truncatechars:60 }}</p>
-                <a href="/posts/{{ post.id }}/" class="btn btn-primary">Подробнее</a>
+
+                <p class="card-text">
+                    {{ post.description|truncatechars:60 }}
+                </p>
+
+                <p class="card-text">
+                    Цена: {{ post.price }}
+                </p>
+
+                <p class="card-text">
+                    Категория:
+                    {% if post.category %}
+                        {{ post.category.name }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </p>
+
+                <p class="card-text">
+                    Тэги:
+                    {% for tag in post.tags.all %}
+                        {{ tag.name }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        —
+                    {% endfor %}
+                </p>
+
+                <a href="/posts/{{ post.id }}/" class="btn btn-primary">
+                    Подробнее
+                </a>
             </div>
         </div>
     </div>
+{% endfor %}
+</div>
+
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        {% for i in max_page %}
+            <li class="page-item {% if i == current_page %}active{% endif %}">
+                <a class="page-link"
+                   href="?page={{ i }}
+                   {% if request.GET.search %}&search={{ request.GET.search }}{% endif %}
+                   {% if request.GET.category %}&category={{ request.GET.category }}{% endif %}
+                   {% for t in selected_tags %}&tags={{ t }}{% endfor %}
+                   {% if request.GET.ordering %}&ordering={{ request.GET.ordering }}{% endif %}
+                   ">
+                    {{ i }}
+                </a>
+            </li>
         {% endfor %}
-</ul>
+    </ul>
+</nav>
 {% endblock %}
 
