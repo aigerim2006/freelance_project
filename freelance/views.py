@@ -1,12 +1,10 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Post
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Post, Comment
 from django.http import HttpResponse
-from .forms import PostForm, SearchForm
+from .forms import PostForm, SearchForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 
-
-# Create your views here.
 
 def home(request):
     if request.method == "GET":
@@ -60,9 +58,44 @@ def post_list(request):
 
 @login_required(login_url="/login/")
 def post_detail(request, post_id):
+    print(request.method)
     if request.method == "GET":
-        post = get_object_or_404(Post, id=post_id)
-        return render(request, "post_detail.html", {"post": post})
+        post = Post.objects.filter(id=post_id).first()
+        post.views += 1
+        post.save()
+        form = CommentForm()
+        comments = Comment.objects.filter(post_id=post_id)
+        comment_count = comments.count()
+        average = 0
+        if comment_count > 0:
+            average = sum([comment.rate for comment in comments]) / comment_count
+        return render(
+            request,
+            "post_detail.html",
+            context={
+                "post": post,
+                "form": form,
+                "comments": comments,
+                "average": int(average),
+            },
+        )
+    elif request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            Comment.objects.create(
+                text=form.cleaned_data["text"],
+                post_id=post_id,
+                author=request.user,
+                rate=form.cleaned_data["rate"],
+            )
+        return redirect(f"/posts/{post_id}/")
+
+    elif request.method == "DELETE":
+        Post.objects.filter(id=post_id).delete()
+        return redirect("/posts/")
+
+
+
 
 @login_required(login_url="/login/")
 def post_create_view(request):
@@ -73,7 +106,34 @@ def post_create_view(request):
     elif request.method == "POST":
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
-            Post.objects.create(**form.cleaned_data)
+            Post.objects.create(
+                title=form.cleaned_data["title"],
+                description=form.cleaned_data["description"],
+                price=form.cleaned_data["price"],
+                photo=form.cleaned_data["photo"],
+                category=form.cleaned_data["category"],
+            )
             return HttpResponse("Заказ создан")
 
         return HttpResponse("Ошибка валидации формы")
+
+@login_required(login_url="/login/")
+def post_update(request, post_id):
+    if request.method == "GET":
+        post = Post.objects.filter(id=post_id).first()
+        form = PostForm(initial=post.__dict__)
+        return render(request, "post_update.html", context={"form": form})
+
+    elif request.method == "PUT":
+        form = PostForm(request.PUT, request.FILES)
+        if form.is_valid():
+            post = Post.objects.filter(id=post_id).first()
+            if request.user == post.user:
+                post.title = form.cleaned_data["title"]
+                post.description = form.cleaned_data["description"]
+                post.price = form.cleaned_data["price"]
+                post.photo = form.cleaned_data["photo"]
+                post.category = form.cleaned_data["category"]
+                post.save()
+
+        return redirect(f"/posts/{post_id}/")

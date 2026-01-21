@@ -10,11 +10,43 @@
         <img src="/static/image1.png" class="card-img-top" alt="...">
     {% endif %}
     <div class="card-body">
-        <h5 class="card-title">{{ post.title }}</h5>
-        <p class="card-text">{{ post.description }}</p>
-        <a href="/posts/" class="btn btn-secondary">Назад</a>
-    </div>
+        <h5 class="card-title">Название: {{ post.title }}</h5>
+        <h6 class="card-title">Описание: {{ post.description }}</h6>
+        <p class="card-text">Цена: {{ post.price }}</p>
+        <p class="card-text">Просмотры: {{ post.views }}</p>
+        <p class="card-text">Средняя оценка: {{ average }}</p>
+
+        {% if request.user == post.user %}
+            <a href="/posts/{{ post.id }}/update/" class="btn btn-primary">Изменить</a>
+        {% else %}
+            <a href="/posts/{{ post.id }}/" class="btn btn-primary">Подробнее</a>
+        {% endif %}
+
+        <form method="POST" action="" enctype="multipart/form-data">
+            {% csrf_token %}
+            <button type="submit">Удалить</button>
+        </form>
 </div>
+
+<form method="POST" action="" enctype="multipart/form-data" class="mt-3">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Оставить комментарий</button>
+</form>
+
+{% for comment in comments %}
+    <div class="card mt-2" style="width: 18rem;">
+        <div class="card-body">
+            <p class="card-text">Текст: {{ comment.text }}</p>
+            <p class="card-text">Автор: {{ comment.author.username }}</p>
+            <p class="card-text">Оценка: {{ comment.rate }}</p>
+        </div>
+    </div>
+{% endfor %}
+
+<a href="/posts/" class="btn btn-secondary mt-3">Назад</a>
+
+
 {% endblock %}
 
 

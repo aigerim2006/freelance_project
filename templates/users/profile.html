@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card mb-4" style="width: 35rem;">
+    {% if user.profile.photo %}
+        <img src="{{ user.profile.photo.url }}" class="card-img-top" alt="Фото профиля">
+    {% else %}
+        <img src="/static/null_image2.png" class="card-img-top" alt="Нет фото">
+    {% endif %}
+
+    <div class="card-body">
+        <h3 class="card-title">Имя: {{ user.username }}</h3>
+        <p class="card-text">Email: {{ user.email }}</p>
+        <p class="card-text">Возраст: {{ user.profile.age }}</p>
+    </div>
+</div>
+
+<h3>Продукты/Заказы пользователя:</h3>
+<div class="row">
+    {% for product in user.product.all %}
+        <div class="col-md-4 mb-4">
+            <div class="card" style="width: 18rem;">
+                {% if product.photo %}
+                    <img src="{{ product.photo.url }}" class="card-img-top" alt="{{ product.name }}">
+                {% else %}
+                    <img src="/static/null_image2.png" class="card-img-top" alt="Нет фото">
+                {% endif %}
+
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">{{ product.description|truncatechars:60 }}</p>
+                    <p class="card-text">Цена: {{ product.price }}</p>
+                    <p class="card-text">Просмотры: {{ product.views }}</p>
+                    <a href="/products/{{ product.id }}/update/" class="btn btn-primary">Изменить</a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>У пользователя пока нет продуктов/заказов.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

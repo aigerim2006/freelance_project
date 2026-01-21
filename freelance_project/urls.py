@@ -19,15 +19,16 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from freelance import views as freelance_views
-from users.views import login_view, logout_view, register_view
+from users.views import login_view, logout_view, register_view, profile_view
 
 
 urlpatterns = [
-    path("admin/", admin.site.urls),        
-    path("", include("freelance.urls")),  
+    path("admin/", admin.site.urls), 
     path("register/", register_view, name="register"),
     path("login/", login_view, name="login"),
     path("logout/", logout_view, name="logout"),   
+    path("profile/", profile_view),
+    path("", include("freelance.urls")),  
 ] 
-
+ 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -41,3 +41,17 @@ class SearchForm(forms.Form):
         choices=ordering, 
         required=False
     )
+
+
+class PostForm(forms.Form):
+    name = forms.CharField(max_length=100)
+    description = forms.CharField(widget=forms.Textarea)
+    price = forms.IntegerField()
+    photo = forms.ImageField(required=False)
+
+class CommentForm(forms.Form):
+    rate_choices = [(1, "1"), (2, "2"), (3, "3"), (4, "4"), (5, "5")]
+    text = forms.CharField(max_length=1000)
+    rate = forms.ChoiceField(choices=rate_choices)
+
+
